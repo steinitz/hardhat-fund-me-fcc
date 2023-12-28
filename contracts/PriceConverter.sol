@@ -24,7 +24,7 @@ library PriceConverter {
     function getEthAmountInUsd(
       uint256 ethAmount, 
       AggregatorV3Interface priceFeed
-      ) public view returns (uint256) {
+      ) internal view returns (uint256) {
         uint256 ethPrice = getPrice(priceFeed);
         uint256 ethAmountInUsd = (ethPrice * ethAmount) / 1e18;
         return ethAmountInUsd;

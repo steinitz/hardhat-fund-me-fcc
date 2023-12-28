@@ -18,7 +18,6 @@ module.exports = async ({
   
   // const chainId = network.config.chainId
 
-
   if (developmentChains.includes(network.name)) {
     log('Local network detected.  Deploying mocks...')
     await deploy(
