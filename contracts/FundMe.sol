@@ -6,73 +6,75 @@ pragma solidity ^0.8.8;
 
 import "./PriceConverter.sol";
 
-error NotOwner();
+error FundMe__NotOwner();
 
 contract FundMe {
-    using PriceConverter for uint256;
+  /**
+   @title: A contract for crowd funding
+   @author Steve Steinitz
+   @notice demos funding
+   @dev implements price feeds as a library
+  */
 
-    uint256 public constant MINIMUM_USD = 50 * 1e18;
+  using PriceConverter for uint256;
 
-    address[] public funders;
-    mapping(address => uint256) public addressToAmountFunded;
+  uint256 public constant MINIMUM_USD = 50 * 1e18;
 
-    address public immutable i_owner;
+  address[] public funders;
+  mapping(address => uint256) public addressToAmountFunded;
 
-    AggregatorV3Interface public priceFeed;
+  address public immutable i_owner;
 
-    constructor(address priceFeedAddress) {
-        i_owner = msg.sender; // whoever deployed this contract
-        priceFeed = AggregatorV3Interface(priceFeedAddress);
+  AggregatorV3Interface public priceFeed;
+
+  modifier onlyOwner {
+    // require(msg.sender == i_owner, "Sender is not owner");
+    if(msg.sender != i_owner) {
+        revert FundMe__NotOwner();
     }
+    _;
+  }
 
-    function fund() public payable {
-        // require(getEthAmountInUsd(msg.value) >= minimumUsd, "Didn't send enough");
-        require(msg.value.getEthAmountInUsd(priceFeed) >= MINIMUM_USD, "Didn't send enough");
-        funders.push(msg.sender);
-        addressToAmountFunded[msg.sender] = msg.value;
-    }
+  constructor(address priceFeedAddress) {
+      i_owner = msg.sender; // whoever deployed this contract
+      priceFeed = AggregatorV3Interface(priceFeedAddress);
+  }
 
-    function withdraw() public onlyOwner {
-        for (uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++) {
-            address funder = funders[funderIndex];
-            addressToAmountFunded[funder] = 0;
-        }
-        // reset the Array
-        funders = new address[](0);
+  receive() external payable {
+    fund();
+  }
 
-        // actually withdraw the funds via transfer or send or call
-        (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
-        require(callSuccess, "Call failed");
-    }
+  fallback() external payable {
+    fund();
+  }
 
-    modifier onlyOwner {
-        // require(msg.sender == i_owner, "Sender is not owner");
-        if(msg.sender != i_owner) {
-            revert NotOwner();
-        }
-        _;
-    }
+  function fund() public payable {
+      // require(getEthAmountInUsd(msg.value) >= minimumUsd, "Didn't send enough");
+      require(msg.value.getEthAmountInUsd(priceFeed) >= MINIMUM_USD, "Didn't send enough");
+      funders.push(msg.sender);
+      addressToAmountFunded[msg.sender] = msg.value;
+  }
 
+  function withdraw() public onlyOwner {
+      for (uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++) {
+          address funder = funders[funderIndex];
+          addressToAmountFunded[funder] = 0;
+      }
+      // reset the Array
+      funders = new address[](0);
 
-    receive() external payable {
-        fund();
-    }
+      // actually withdraw the funds via transfer or send or call
+      (bool callSuccess, ) = payable(msg.sender).call{value: address(this).balance}("");
+      require(callSuccess, "Call failed");
+  }
 
-    fallback() external payable {
-        fund();
-    }
-
+  // transfer - automatically reverts
+  // payable(msg.sender).transfer(address (this).balance);
+  // // send - requires an explicit require test
+  // bool sendSuccess = payable(msg.sender).send(address (this).balance);
+  // require(sendSuccess, "Send failed");
+  // call - recommended way for now
 }
-
-
-        // transfer - automatically reverts
-        // payable(msg.sender).transfer(address (this).balance);
-        // // send - requires an explicit require test
-        // bool sendSuccess = payable(msg.sender).send(address (this).balance);
-        // require(sendSuccess, "Send failed");
-        // call - recommended way for now
-
-
 
 
 /*

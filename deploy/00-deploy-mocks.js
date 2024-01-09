@@ -5,14 +5,14 @@ const {
   INITIAL_PRICE
 } = require('../helper-hardhat-config.js')
 
-console.log('00-deploy-mocks.js', {developmentChains}, {DECIMALS}, {INITIAL_PRICE})
+// console.log('00-deploy-mocks.js', {developmentChains}, {DECIMALS}, {INITIAL_PRICE})
 
 module.exports = async ({
   getNamedAccounts, 
   deployments: {deploy = undefined, log = undefined} = {}
 }) => {
   const {deployer} = await getNamedAccounts()
-  console.log('00-deploy-mocks.js', {deployer})
+  // console.log('00-deploy-mocks.js', {deployer})
 
   // console.log('00-deploy-mocks.js', {network})
   

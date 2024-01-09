@@ -4,6 +4,7 @@ const {
   developmentChains,
 } = require("../helper-hardhat-config")
 const {network} = require('hardhat')
+const {verify} = require("../utils/verify")
 
 // console.log('01-deploy-fund-me', {network})
 
@@ -12,7 +13,7 @@ const chainId = network.config.chainId
 
 // console.log('01-deploy-fund-me', {networkConfig})
 // const currentChain = networkConfig[chainId]
-// console.log({currentChain})
+// console.log('01-deploy-fund-me', {currentChain})
 
 // const theEthUsdPriceFeedAddress = currentChain.ethUsdPriceFeedAddress
 
@@ -26,12 +27,12 @@ module.exports = async ({
 }) => {
   const {deployer} = await getNamedAccounts()
 
-  console.log(
-    '01-deploy-fund-me - anonymous deploy fundMe script running with',
-    {deployer},
-    {deploy},
-    {log},
-  )
+  // console.log(
+  //   '01-deploy-fund-me - anonymous deploy fundMe script running with',
+  //   {deployer},
+  //   {deploy},
+  //   {log},
+  // )
 
   let ethUsdPriceFeedAddress
   
@@ -40,14 +41,28 @@ module.exports = async ({
     ethUsdPriceFeedAddress = ethUsdAggregator.address
   }
   else {
-    ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeed"]
+    ethUsdPriceFeedAddress = networkConfig[chainId]["ethUsdPriceFeedAddress"]
   }
+
+  // console.log('01-deploy-fund-me', {ethUsdPriceFeedAddress})
     
+  const args = [ethUsdPriceFeedAddress]
+
   const fundMe = await deploy("FundMe", {
     from: deployer,
-    args: [ethUsdPriceFeedAddress],
-    log: true
+    args,
+    log: true,
+    waitConfirmations: network.config.blockConfirmations || 1,
   })
+
+  // verification
+  if (
+    !developmentChains.includes(network.name) &&
+    process.env.ETHERSCAN_API_KEY
+  ) {
+    verify(fundMe.address, args)
+  }
+
 
   log('---------------------------------------')
 

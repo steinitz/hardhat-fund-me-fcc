@@ -26,6 +26,7 @@ module.exports = {
       url: SEPOLIA_RPC_URL,
       accounts: [SEPOLIA_KEY],
       chainId: SEPOLIA_CHAIN_ID,
+      blockConfirmations: 6, // wait this many blocks after deploying
     },
     localhost: {
       url: 'http://127.0.0.1:8545/',
@@ -47,8 +48,8 @@ module.exports = {
   },
   namedAccounts: {
     deployer: {
-        default: 0, // here this will by default take the first account as deployer
-        1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
+        default: 0, // this will by default take the first account as deployer
+        1: 0, // similarly on mainnet it will take the first account as deployer. Note that depending on how hardhat network are configured, the account 0 on one network can be different than on another
     },
 },
 }
