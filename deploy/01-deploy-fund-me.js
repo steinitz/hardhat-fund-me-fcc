@@ -5,6 +5,7 @@ const {
 } = require("../helper-hardhat-config")
 const {network} = require('hardhat')
 const {verify} = require("../utils/verify")
+const {insufficentETH} = require('../constants')
 
 // console.log('01-deploy-fund-me', {network})
 
@@ -46,7 +47,7 @@ module.exports = async ({
 
   // console.log('01-deploy-fund-me', {ethUsdPriceFeedAddress})
     
-  const args = [ethUsdPriceFeedAddress]
+  const args = [ethUsdPriceFeedAddress, insufficentETH]
 
   const fundMe = await deploy("FundMe", {
     from: deployer,

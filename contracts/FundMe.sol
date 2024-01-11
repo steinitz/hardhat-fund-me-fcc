@@ -25,6 +25,8 @@ contract FundMe {
 
   address public immutable i_owner;
 
+  string private insufficentETHErrorMessage;
+
   AggregatorV3Interface public priceFeed;
 
   modifier onlyOwner {
@@ -35,22 +37,23 @@ contract FundMe {
     _;
   }
 
-  constructor(address priceFeedAddress) {
+  constructor(address priceFeedAddress, string memory insufficentETH) {
       i_owner = msg.sender; // whoever deployed this contract
       priceFeed = AggregatorV3Interface(priceFeedAddress);
+      insufficentETHErrorMessage = insufficentETH;
   }
 
-  receive() external payable {
-    fund();
-  }
+  // receive() external payable {
+  //   fund();
+  // }
 
-  fallback() external payable {
-    fund();
-  }
+  // fallback() external payable {
+  //   fund();
+  // }
 
   function fund() public payable {
       // require(getEthAmountInUsd(msg.value) >= minimumUsd, "Didn't send enough");
-      require(msg.value.getEthAmountInUsd(priceFeed) >= MINIMUM_USD, "Didn't send enough");
+      require(msg.value.getEthAmountInUsd(priceFeed) >= MINIMUM_USD, insufficentETHErrorMessage);
       funders.push(msg.sender);
       addressToAmountFunded[msg.sender] = msg.value;
   }

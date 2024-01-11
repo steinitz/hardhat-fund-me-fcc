@@ -1,9 +1,9 @@
 const {
   deployments, 
   ethers,
-  getNamedAccounts
 } = require("hardhat")
-const {assert} = require("chai")
+const {assert, expect} = require("chai")
+const {insufficentETH} = require('../../constants')
 
 describe("FundMe", async function () {
   let fundMe
@@ -43,4 +43,11 @@ describe("FundMe", async function () {
       assert.equal(mockV3Aggregator.target, response)
     })
   })
+
+  describe("fund", async function () {
+    it("fails if you don't send enough ETH", async function () {
+      await expect(fundMe.fund()).to.be.revertedWith(insufficentETH)
+    })
+  })
+
 })

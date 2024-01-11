@@ -13,7 +13,6 @@ module.exports = async ({
 }) => {
   const {deployer} = await getNamedAccounts()
   // console.log('00-deploy-mocks.js', {deployer})
-
   // console.log('00-deploy-mocks.js', {network})
   
   // const chainId = network.config.chainId
