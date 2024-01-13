@@ -7,13 +7,12 @@ const {insufficentETH} = require('../../constants')
 
 describe("FundMe", async function () {
   let fundMe
-  let deployer
   let mockV3Aggregator
+  let signer // note: Patrick's code uses deployer
+  const valueToSend = ethers.parseEther("1") // 1 ETH
 
   beforeEach(async function () {
-    // const namedAccounts = await getNamedAccounts()
-    // deployer = namedAccounts.deployer
-    const signer = await ethers.provider.getSigner()
+    signer = await ethers.provider.getSigner()
     await deployments.fixture(["all"])
     fundMe = await ethers.getContractAt(
       "FundMe", 
@@ -27,10 +26,7 @@ describe("FundMe", async function () {
     )
     // console.log(
     //   'FundMe.test beforeEach', {
-    //     namedAccounts,
-    //     deployer, 
     //     signer,
-    //     // fundMe, 
     //     mockV3Aggregator,
     //   }
     // )
@@ -39,7 +35,6 @@ describe("FundMe", async function () {
   describe("constructor", async function () {
     it("sets the aggregator addresses correclty", async function () {
       const response = await fundMe.priceFeed()
-      // console.log('FundMe.test aggregator test', {response})
       assert.equal(mockV3Aggregator.target, response)
     })
   })
@@ -47,6 +42,14 @@ describe("FundMe", async function () {
   describe("fund", async function () {
     it("fails if you don't send enough ETH", async function () {
       await expect(fundMe.fund()).to.be.revertedWith(insufficentETH)
+    })
+
+    it("updates the amount funded data structure", async function () {
+      await fundMe.fund({value: valueToSend})
+      const response = await fundMe.addressToAmountFunded(
+        signer
+      )
+      assert.equal(response.toString(), valueToSend.toString())
     })
   })
 
