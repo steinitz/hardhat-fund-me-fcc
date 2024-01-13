@@ -52,7 +52,6 @@ contract FundMe {
   // }
 
   function fund() public payable {
-      // require(getEthAmountInUsd(msg.value) >= minimumUsd, "Didn't send enough");
       require(msg.value.getEthAmountInUsd(priceFeed) >= MINIMUM_USD, insufficentETHErrorMessage);
       funders.push(msg.sender);
       addressToAmountFunded[msg.sender] = msg.value;
