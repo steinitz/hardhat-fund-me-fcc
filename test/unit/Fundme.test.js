@@ -51,6 +51,14 @@ describe("FundMe", async function () {
       )
       assert.equal(response.toString(), valueToSend.toString())
     })
+
+    it.only('adds funder to array of funders', async function () {
+      await fundMe.fund({value: valueToSend})
+      const funder = await fundMe.funders(0)
+      // console.log({funder, signer})
+      const signerAddress = signer.address
+      assert.equal(funder, signerAddress)
+    })
   })
 
 })
