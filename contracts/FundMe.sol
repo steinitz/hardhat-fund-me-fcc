@@ -58,9 +58,13 @@ contract FundMe {
   }
 
   function withdraw() public onlyOwner {
-      for (uint256 funderIndex = 0; funderIndex < funders.length; funderIndex++) {
-          address funder = funders[funderIndex];
-          addressToAmountFunded[funder] = 0;
+      for (
+        uint256 funderIndex = 0; 
+        funderIndex < funders.length; 
+        funderIndex++
+      ) {
+        address funder = funders[funderIndex];
+        addressToAmountFunded[funder] = 0;
       }
       // reset the Array
       funders = new address[](0);
@@ -77,7 +81,6 @@ contract FundMe {
   // require(sendSuccess, "Send failed");
   // call - recommended way for now
 }
-
 
 /*
 contract Lock {
