@@ -62,13 +62,30 @@ describe("FundMe", async () => {
   })
 
   describe('withdraw', async () => {
-    beforeEach(async () => {
-      console.log('withdraw, beforeEach')
-      await fundMe.fund({value: valueToSend})
-    })
+    // beforeEach(async () => {
+    //   console.log('withdraw, beforeEach')
+    //   await fundMe.fund({value: valueToSend})
+    // })
 
-    it.only('can withdraw ETH from a single founder', async () => {
-       // arrange
+    const fund = async (numberOfFunders) => {
+      const accounts = await ethers.getSigners()
+      for(let i=1; i <= numberOfFunders; i++) {
+        const fundMeConnectedContract = await fundMe.connect(accounts[i])
+        await fundMeConnectedContract.fund({value: valueToSend})
+      }
+      return accounts; // callers don't always need this
+    }
+
+    const calculateGasCost = (transactionReceipt) => {
+      const {gasUsed, gasPrice} = transactionReceipt
+      console.log({gasUsed, gasPrice})
+      const gasCost = gasUsed * gasPrice
+      return gasCost
+    }
+
+    it('can withdraw ETH when only a single funder has funded', async () => {
+      // arrange
+      await fund(1)
       const startingFundMeBalance = await ethers.provider.getBalance(fundMe)
       console.log({startingFundMeBalance})
       const startingDeployerBalance = await ethers.provider.getBalance(signer)
@@ -78,17 +95,12 @@ describe("FundMe", async () => {
       const transactionResponse = await fundMe.withdraw()
       const transactionReceipt = await transactionResponse.wait(1)
 
-
-
       const endingFundMeBalance = await ethers.provider.getBalance(fundMe)
       console.log({startingFundMeBalance})
       const endingDeployerBalance = await ethers.provider.getBalance(signer)
       console.log({endingDeployerBalance})
 
-      // gas cost
-      const {gasUsed, gasPrice} = transactionReceipt
-      console.log({gasUsed, gasPrice})
-      const gasCost = gasUsed * gasPrice
+      const gasCost = calculateGasCost(transactionReceipt)
 
       // assert
       assert.equal(endingFundMeBalance, 0)
@@ -96,6 +108,44 @@ describe("FundMe", async () => {
         startingDeployerBalance + startingFundMeBalance,
         (endingDeployerBalance + gasCost).toString()
       )
+    })
+
+    it.only('can withdraw ETH when multiple funders have funded', async () => {
+      const numberOfTestFundersToCreate = 5
+      const accounts = await fund(numberOfTestFundersToCreate)
+      const startingFundMeBalance = await ethers.provider.getBalance(fundMe)
+      // console.log({startingFundMeBalance})
+      const startingDeployerBalance = await ethers.provider.getBalance(signer)
+      // console.log({startingDeployerBalance})
+
+      const transactionResponse = await fundMe.withdraw()
+      const transactionReceipt = await transactionResponse.wait(1)
+
+      const gasCost = calculateGasCost(transactionReceipt)
+
+      const endingFundMeBalance = await ethers.provider.getBalance(fundMe)
+      console.log({startingFundMeBalance})
+      const endingDeployerBalance = await ethers.provider.getBalance(signer)
+      console.log({endingDeployerBalance})
+
+      assert.equal(endingFundMeBalance, 0)
+      assert.equal(
+        startingDeployerBalance + startingFundMeBalance,
+        (endingDeployerBalance + gasCost).toString()
+      )
+
+      // shouldn't be any funders after the withdrawal
+      await expect(fundMe.funders(0)).to.be.reverted 
+
+      for (let i = 1; i <= numberOfTestFundersToCreate; i++) {
+        const amountFunded = await fundMe.addressToAmountFunded(accounts[i])
+        // console.log({amountFunded})
+        assert.equal(
+          amountFunded,
+          0
+        )
+      }
+
     })
 
   })

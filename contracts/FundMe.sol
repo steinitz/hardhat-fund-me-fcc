@@ -16,7 +16,7 @@ contract FundMe {
    @dev implements price feeds as a library
   */
 
-  using PriceConverter for uint256;
+   using PriceConverter for uint256;
 
   uint256 public constant MINIMUM_USD = 50 * 1e18;
 
@@ -38,9 +38,10 @@ contract FundMe {
   }
 
   constructor(address priceFeedAddress, string memory insufficentETH) {
-      i_owner = msg.sender; // whoever deployed this contract
-      priceFeed = AggregatorV3Interface(priceFeedAddress);
-      insufficentETHErrorMessage = insufficentETH;
+    i_owner = msg.sender; // whoever deployed this contract
+    priceFeed = AggregatorV3Interface(priceFeedAddress);
+    insufficentETHErrorMessage = insufficentETH;
+    // console.log("testing console.log in solidity", i_owner);
   }
 
   // receive() external payable {
