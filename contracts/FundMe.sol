@@ -32,7 +32,7 @@ contract FundMe {
   modifier onlyOwner {
     // require(msg.sender == i_owner, "Sender is not owner");
     if(msg.sender != i_owner) {
-        revert FundMe__NotOwner();
+        revert  ();
     }
     _;
   }

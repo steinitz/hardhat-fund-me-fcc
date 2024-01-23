@@ -110,7 +110,7 @@ describe("FundMe", async () => {
       )
     })
 
-    it.only('can withdraw ETH when multiple funders have funded', async () => {
+    it('can withdraw ETH when multiple funders have funded', async () => {
       const numberOfTestFundersToCreate = 5
       const accounts = await fund(numberOfTestFundersToCreate)
       const startingFundMeBalance = await ethers.provider.getBalance(fundMe)
@@ -145,7 +145,17 @@ describe("FundMe", async () => {
           0
         )
       }
+    })
 
+    it('only allows the owner to withdraw', async () => {
+      const accounts = await ethers.getSigners()
+      const attacker = accounts[1]
+      const attackerConnectedContract = await fundMe.connect(attacker)
+      await expect(attackerConnectedContract.withdraw()).to.be
+        .revertedWithCustomError(
+          attackerConnectedContract,
+          "FundMe__NotOwner"
+        )
     })
 
   })
