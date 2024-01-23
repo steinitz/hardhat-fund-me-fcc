@@ -78,7 +78,7 @@ describe("FundMe", async () => {
 
     const calculateGasCost = (transactionReceipt) => {
       const {gasUsed, gasPrice} = transactionReceipt
-      console.log({gasUsed, gasPrice})
+      // console.log({gasUsed, gasPrice})
       const gasCost = gasUsed * gasPrice
       return gasCost
     }
@@ -87,18 +87,18 @@ describe("FundMe", async () => {
       // arrange
       await fund(1)
       const startingFundMeBalance = await ethers.provider.getBalance(fundMe)
-      console.log({startingFundMeBalance})
+      // console.log({startingFundMeBalance})
       const startingDeployerBalance = await ethers.provider.getBalance(signer)
-      console.log({startingDeployerBalance})
+      // console.log({startingDeployerBalance})
 
       // act
       const transactionResponse = await fundMe.withdraw()
       const transactionReceipt = await transactionResponse.wait(1)
 
       const endingFundMeBalance = await ethers.provider.getBalance(fundMe)
-      console.log({startingFundMeBalance})
+      // console.log({startingFundMeBalance})
       const endingDeployerBalance = await ethers.provider.getBalance(signer)
-      console.log({endingDeployerBalance})
+      // console.log({endingDeployerBalance})
 
       const gasCost = calculateGasCost(transactionReceipt)
 
@@ -124,9 +124,9 @@ describe("FundMe", async () => {
       const gasCost = calculateGasCost(transactionReceipt)
 
       const endingFundMeBalance = await ethers.provider.getBalance(fundMe)
-      console.log({startingFundMeBalance})
+      // console.log({startingFundMeBalance})
       const endingDeployerBalance = await ethers.provider.getBalance(signer)
-      console.log({endingDeployerBalance})
+      // console.log({endingDeployerBalance})
 
       assert.equal(endingFundMeBalance, 0)
       assert.equal(
