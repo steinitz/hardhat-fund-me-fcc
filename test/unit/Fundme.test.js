@@ -34,7 +34,7 @@ describe("FundMe", async () => {
   
   describe("constructor", async function () {
     it("sets the aggregator addresses correclty", async () => {
-      const response = await fundMe.priceFeed()
+      const response = await fundMe.getPriceFeed()
       assert.equal(mockV3Aggregator.target, response)
     })
   })
@@ -46,7 +46,7 @@ describe("FundMe", async () => {
 
     it("updates the amount funded data structure", async () => {
       await fundMe.fund({value: valueToSend})
-      const response = await fundMe.addressToAmountFunded(
+      const response = await fundMe.getAddressToAmountFunded(
         signer
       )
       assert.equal(response.toString(), valueToSend.toString())
@@ -54,7 +54,7 @@ describe("FundMe", async () => {
 
     it('adds funder to array of funders', async () => {
       await fundMe.fund({value: valueToSend})
-      const funder = await fundMe.funders(0)
+      const funder = await fundMe.getFunder(0)
       // console.log({funder, signer})
       const signerAddress = signer.address
       assert.equal(funder, signerAddress)
@@ -135,10 +135,10 @@ describe("FundMe", async () => {
       )
 
       // shouldn't be any funders after the withdrawal
-      await expect(fundMe.funders(0)).to.be.reverted 
+      await expect(fundMe.getFunder(0)).to.be.reverted 
 
       for (let i = 1; i <= numberOfTestFundersToCreate; i++) {
-        const amountFunded = await fundMe.addressToAmountFunded(accounts[i])
+        const amountFunded = await fundMe.getAddressToAmountFunded(accounts[i])
         // console.log({amountFunded})
         assert.equal(
           amountFunded,
