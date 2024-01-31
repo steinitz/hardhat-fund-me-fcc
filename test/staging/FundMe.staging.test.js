@@ -2,34 +2,35 @@ const {
   deployments, 
   ethers,
   network,
-  getNamedAccounts,
 } = require("hardhat")
 const {assert} = require("chai")
 const {developmentChains} = require('../../helper-hardhat-config.js')
+const {getContract} = require('../../utils/getContract')
 
 // NB: this test will fail if the account has less than valueToSend ETH plus gas
 
-const valueToSend = ethers.parseEther("0.3") // 1 ETH
+const valueToSend = ethers.parseEther("0.3") // 0.3 ETH
 
 developmentChains.includes(network.name)
   ? describe.skip
   :describe ('FundMe', async () => {
     console.log('Running staging tests')
     let fundMe
-    let signer
+    // let signer
 
     beforeEach(async function () {
-      // deployer = await getNamedAccounts().deployer
-      signer = await ethers.provider.getSigner()
+      ({contract: fundMe} = await getContract("FundMe"))
 
-      const deployment = await deployments.get("FundMe")
-      // console.log({deployment})
+      // signer = await ethers.provider.getSigner()
 
-      fundMe = await ethers.getContractAt(
-        "FundMe", 
-        deployment.address, 
-        signer
-      )  
+      // const deployment = await deployments.get("FundMe")
+      // // console.log({deployment})
+
+      // fundMe = await ethers.getContractAt(
+      //   "FundMe", 
+      //   deployment.address, 
+      //   signer
+      // )  
       // console.log({fundMe})
     })
 

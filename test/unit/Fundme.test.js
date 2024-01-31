@@ -6,22 +6,20 @@ const {assert, expect} = require("chai")
 const {insufficentETH} = require('../../constants')
 const {developmentChains} = require('../../helper-hardhat-config.js')
 
+const {getContract} = require('../../utils/getContract')
+
 !developmentChains.includes(network.name)
   ? describe.skip
   :describe("FundMe", async () => {
     let fundMe
-    let mockV3Aggregator
     let signer // note: Patrick's code uses deployer
+    let mockV3Aggregator
     const valueToSend = ethers.parseEther("1") // 1 ETH
 
     beforeEach(async () => {
-      signer = await ethers.provider.getSigner()
-      await deployments.fixture(["all"])
-      fundMe = await ethers.getContractAt(
-        "FundMe", 
-        (await deployments.get("FundMe")).address, 
-        signer
-      )
+ 
+      ({signer, contract: fundMe} = await getContract("FundMe", ["all"]))
+      
       mockV3Aggregator = await ethers.getContractAt(
         "MockV3Aggregator", 
         (await deployments.get("MockV3Aggregator")).address, 
