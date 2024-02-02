@@ -1,5 +1,12 @@
 {
   "license": "MIT",
+  "name": "Hardhat FundMe",
+  "author": "Steve Steinitz",
+  "scripts": {
+    "test": "yarn hardhat test",
+    "test:staging": "yarn hardhat test --network sepolia",
+    "coverage": "yarh hardhat coverate"
+  },
   "devDependencies": {
     "@chainlink/contracts": "^0.8.0",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
