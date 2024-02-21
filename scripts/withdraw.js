@@ -12,9 +12,9 @@ async function main() {
   let fundMe
   ({contract: fundMe} = await getContract("FundMe"))
   console.log('Withdrawing from FundMe contract')
-  const transactionResponse = await fundMe.withdraw({
-    value: valueToSend,
-  })
+  const transactionResponse = await fundMe.withdraw(
+    {value: valueToSend}
+  )
   await transactionResponse.wait(1)
   console.log('Withdrawn')
 }

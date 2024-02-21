@@ -1,6 +1,6 @@
 {
   "license": "MIT",
-  "name": "Hardhat FundMe",
+  "name": "hardhat-fund-me",
   "author": "Steve Steinitz",
   "scripts": {
     "test": "yarn hardhat test",
