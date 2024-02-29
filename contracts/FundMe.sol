@@ -2,7 +2,7 @@
 pragma solidity ^0.8.8;
 
 // Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 import "./PriceConverter.sol";
 
@@ -32,8 +32,10 @@ contract FundMe {
   AggregatorV3Interface private s_priceFeed;
 
   modifier onlyOwner {
-    // require(msg.sender == i_owner, "Sender is not owner");
+    // console.log("owner is %o", i_owner);
+    // console.log("sender is %o", msg.sender);
     if(msg.sender != i_owner) {
+      console.log('onlyOwner: sender is not owner, reverting');
       revert FundMe__NotOwner();
     }
     _;
@@ -41,6 +43,7 @@ contract FundMe {
 
   constructor(address priceFeedAddress, string memory insufficentETH) {
     i_owner = msg.sender; // whoever deployed this contract
+    // console.log("\nFundme constructor: owner is %o\n", i_owner);
     s_priceFeed = AggregatorV3Interface(priceFeedAddress);
     s_insufficentEthErrorMessage = insufficentETH;
     // console.log("testing console.log in solidity", i_owner);
@@ -60,24 +63,6 @@ contract FundMe {
       s_addressToAmountFunded[msg.sender] = msg.value;
   }
 
-  // function withdraw() public onlyOwner {
-  //     for (
-  //       uint256 funderIndex = 0; 
-  //       funderIndex < s_funders.length; 
-  //       funderIndex++
-  //     ) {
-  //       address funder = s_funders[funderIndex];
-  //       s_addressToAmountFunded[funder] = 0;
-  //     }
-  //     // reset the Array
-  //     s_funders = new address[](0);
-
-  //     // actually withdraw the funds via transfer or send or call
-  //     (bool callSuccess, ) = payable(msg.sender)
-  //       .call{value: address(this).balance}("");
-  //     require(callSuccess, "Call failed");
-  // }
-
   function withdraw() public payable onlyOwner {
     address[] memory funders = s_funders;
     for (
@@ -87,16 +72,17 @@ contract FundMe {
     ) {
       address funder = funders[funderIndex];
       s_addressToAmountFunded[funder] = 0;
-
     }
       // reset the Array
       s_funders = new address[](0);
 
       // actually withdraw the funds via transfer or send or call
-      (bool callSuccess, ) = payable(msg.sender)
-        .call{value: address(this).balance}("");
-      require(callSuccess, "Call failed");
+      // (bool callSuccess, ) = payable(msg.sender)
+      //   .call{value: address(this).balance}("");
+      (bool callSuccess, ) = payable(i_owner).call{value: address(this).balance}("");
+      console.log("Withdraw callSuccess is %o", callSuccess);
 
+      require(callSuccess, "Call failed");
   }
 
   function getOwner() public view returns (address) {
@@ -115,6 +101,13 @@ contract FundMe {
     return s_priceFeed;
   }
 
+  // this hides MetaMasks transgressions
+  fallback() external payable {}
+  // this avoids warnings from adding the above
+  receive() external payable {}
+
+
+  // Ways of transferring crypto
   // transfer - automatically reverts
   // payable(msg.sender).transfer(address (this).balance);
   // // send - requires an explicit require test
@@ -124,6 +117,7 @@ contract FundMe {
 }
 
 /*
+// Original Sample code
 contract Lock {
     uint public unlockTime;
     address payable public owner;
