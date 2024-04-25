@@ -150,12 +150,12 @@ const {getContract} = require('../../utils/getContract')
       it('only allows the owner to withdraw', async () => {
         const accounts = await ethers.getSigners()
         const attacker = accounts[1]
-        const attackerConnectedContract = await fundMe.connect(attacker)
-        await expect(attackerConnectedContract.withdraw()).to.be
+        await expect(fundMe.connect(attacker).withdraw()).to.be
           .revertedWithCustomError(
-            attackerConnectedContract,
+            fundMe,
             "FundMe__NotOwner"
           )
+
       })
     })
   })
